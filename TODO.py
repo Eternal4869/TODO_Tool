@@ -7,9 +7,167 @@ import subprocess
 import shutil
 import difflib
 from pathlib import Path
+import psutil
+import netifaces
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+
+# ==================== IP 地址显示组件 ====================
+class IPAddressWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        self.load_ip_addresses()
+    
+    def setup_ui(self):
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(5)
+        
+        # 标题
+        title_label = QLabel("🌐 本机 IP 地址")
+        title_label.setStyleSheet("font-weight: bold; font-size: 14px; color: #0078D7;")
+        main_layout.addWidget(title_label)
+        
+        # IP 列表容器 - 使用 QHBoxLayout 代替 QFlowLayout
+        self.ip_container = QWidget()
+        self.ip_layout = QHBoxLayout(self.ip_container)
+        self.ip_layout.setSpacing(5)
+        self.ip_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(self.ip_container)
+        
+        self.setLayout(main_layout)
+    
+    def load_ip_addresses(self):
+        # 清空现有 IP 标签
+        while self.ip_layout.count():
+            item = self.ip_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        ip_list = self.get_all_ips()
+        
+        if not ip_list:
+            label = QLabel("未找到可用 IP 地址")
+            label.setStyleSheet("color: #999; padding: 5px;")
+            self.ip_layout.addWidget(label)
+            return
+        
+        for ip_info in ip_list:
+            ip_btn = self.create_ip_button(ip_info)
+            self.ip_layout.addWidget(ip_btn)
+    
+    def get_all_ips(self):
+        """获取所有网络接口的 IP 地址"""
+        ip_list = []
+        try:
+            # 使用 netifaces 获取所有网络接口
+            interfaces = netifaces.interfaces()
+            for iface in interfaces:
+                try:
+                    addrs = netifaces.ifaddresses(iface)
+                    if netifaces.AF_INET in addrs:
+                        for link in addrs[netifaces.AF_INET]:
+                            ip = link.get('addr', '')
+                            if ip and ip != '127.0.0.1':
+                                ip_list.append({'ip': ip, 'interface': iface, 'type': 'IPv4'})
+                    if netifaces.AF_INET6 in addrs:
+                        for link in addrs[netifaces.AF_INET6]:
+                            ip = link.get('addr', '')
+                            if ip and ip != '::1' and '%' not in ip:
+                                ip_list.append({'ip': ip, 'interface': iface, 'type': 'IPv6'})
+                except Exception:
+                    continue
+            
+            # 如果 netifaces 没有获取到，尝试使用 psutil
+            if not ip_list:
+                addrs = psutil.net_if_addrs()
+                for interface_name, interface_addresses in addrs.items():
+                    for addr in interface_addresses:
+                        if addr.family == socket.AF_INET:
+                            if addr.address and addr.address != '127.0.0.1':
+                                ip_list.append({'ip': addr.address, 'interface': interface_name, 'type': 'IPv4'})
+                        elif addr.family == socket.AF_INET6:
+                            if addr.address and addr.address != '::1' and '%' not in addr.address:
+                                ip_list.append({'ip': addr.address, 'interface': interface_name, 'type': 'IPv6'})
+            
+            # 最后尝试 socket 方法
+            if not ip_list:
+                host_name = socket.gethostname()
+                addr_info = socket.getaddrinfo(host_name, None)
+                for info in addr_info:
+                    ip = info[4][0]
+                    if ":" not in ip and ip != "127.0.0.1":
+                        ip_list.append({'ip': ip, 'interface': 'default', 'type': 'IPv4'})
+            
+            # 如果还是没有，至少返回 localhost
+            if not ip_list:
+                ip_list.append({'ip': '127.0.0.1', 'interface': 'localhost', 'type': 'IPv4'})
+                
+        except Exception as e:
+            ip_list.append({'ip': '127.0.0.1', 'interface': 'localhost', 'type': 'IPv4'})
+        
+        return ip_list
+    
+    def create_ip_button(self, ip_info):
+        """创建 IP 地址按钮"""
+        btn = QPushButton(f"{ip_info['ip']}")
+        btn.setToolTip(f"接口：{ip_info['interface']}\n类型：{ip_info['type']}\n右键点击复制")
+        btn.setStyleSheet("""
+            QPushButton {
+                background: #e3f2fd;
+                border: 1px solid #90caf9;
+                border-radius: 4px;
+                padding: 5px 10px;
+                color: #1565c0;
+                font-family: Consolas, monospace;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background: #bbdefb;
+                border: 1px solid #64b5f6;
+            }
+            QPushButton:pressed {
+                background: #90caf9;
+            }
+        """)
+        
+        # 创建右键菜单
+        btn.setContextMenuPolicy(Qt.CustomContextMenu)
+        btn.customContextMenuRequested.connect(
+            lambda pos, ip=ip_info['ip']: self.show_ip_context_menu(btn, ip, pos)
+        )
+        
+        # 左键点击也复制
+        btn.clicked.connect(lambda checked, ip=ip_info['ip']: self.copy_ip(ip))
+        
+        return btn
+    
+    def show_ip_context_menu(self, btn, ip, pos):
+        """显示 IP 右键菜单"""
+        menu = QMenu(self)
+        copy_action = menu.addAction("📋 复制 IP 地址")
+        copy_action.triggered.connect(lambda: self.copy_ip(ip))
+        menu.exec_(btn.mapToGlobal(pos))
+    
+    def copy_ip(self, ip):
+        """复制 IP 到剪贴板"""
+        clipboard = QApplication.clipboard()
+        clipboard.setText(ip)
+        # 显示提示
+        tip = QLabel(f"✓ 已复制：{ip}")
+        tip.setStyleSheet("""
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        """)
+        tip.setWindowFlags(Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint)
+        tip.show()
+        QTimer.singleShot(1500, tip.close)
+
 
 # ==================== 待办事项组件 ====================
 class TodoItem(QWidget):
@@ -43,25 +201,58 @@ class TodoItem(QWidget):
         
         self.label = QLabel(text)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.label.setStyleSheet("padding: 3px;")
         if done:
-            self.label.setStyleSheet("color: #888888; text-decoration: line-through; ")
+            self.label.setStyleSheet("color: #888888; text-decoration: line-through; padding: 3px;")
         layout.addWidget(self.label)
         
-        self.del_btn = QPushButton("× ")
+        # 编辑按钮
+        self.edit_btn = QPushButton("✏️")
+        self.edit_btn.setFixedSize(25, 25)
+        self.edit_btn.setToolTip("编辑")
+        self.edit_btn.setStyleSheet("""
+            QPushButton { 
+                background: #4fc3f7; 
+                color: white; 
+                border: none; 
+                border-radius: 3px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background: #29b6f6;
+            }
+        """)
+        layout.addWidget(self.edit_btn)
+        
+        self.del_btn = QPushButton("🗑️")
         self.del_btn.setFixedSize(25, 25)
+        self.del_btn.setToolTip("删除")
         self.del_btn.setStyleSheet("""
             QPushButton { 
                 background: #ff6b6b; 
                 color: white; 
                 border: none; 
                 border-radius: 3px;
-                font-weight: bold;
+                font-size: 14px;
             }
             QPushButton:hover {
                 background: #ee5a5a;
             }
         """)
         layout.addWidget(self.del_btn)
+        
+        # 设置整体样式
+        self.setStyleSheet("""
+            QWidget {
+                background: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 5px;
+            }
+            QWidget:hover {
+                background: #f5f5f5;
+                border: 1px solid #bdbdbd;
+            }
+        """)
         self.setLayout(layout)
 
 # ==================== 快捷启动组件 ====================
@@ -631,7 +822,7 @@ class DesktopTool(QMainWindow):
         self.load_memo()
         self.load_apps()
         self.update_time()
-        self.update_ip()
+        # IP 地址由 IPAddressWidget 组件自动加载
 
     def init_ui(self):
         self.setWindowTitle("个人效率小工具")
@@ -644,9 +835,14 @@ class DesktopTool(QMainWindow):
         main_layout.setSpacing(10)
         
         # === 顶部信息区 ===
-        self.ip_label = QLabel("本机 IP: 获取中...")
-        self.ip_label.setStyleSheet("font-weight: bold; color: #0078D7; ")
-        main_layout.addWidget(self.ip_label)
+        # 使用新的 IP 地址显示组件
+        self.ip_widget = IPAddressWidget()
+        main_layout.addWidget(self.ip_widget)
+        
+        separator_top = QFrame()
+        separator_top.setFrameShape(QFrame.HLine)
+        separator_top.setFrameShadow(QFrame.Sunken)
+        main_layout.addWidget(separator_top)
         
         self.time_label = QLabel("")
         self.time_label.setStyleSheet("font-family: Consolas; font-size: 14px; ")
@@ -863,18 +1059,7 @@ class DesktopTool(QMainWindow):
         self.time_label.setText(f"{time_str} 星期{weekday_map[now.weekday()]}")
         QTimer.singleShot(1000, self.update_time)
 
-    def update_ip(self):
-        try:
-            host_name = socket.gethostname()
-            addr_info = socket.getaddrinfo(host_name, None)
-            for info in addr_info:
-                ip = info[4][0]
-                if ":" not in ip and ip != "127.0.0.1":
-                    self.ip_label.setText(f"本机 IP: {ip}")
-                    return
-            self.ip_label.setText("本机 IP: 127.0.0.1")
-        except:
-            self.ip_label.setText("本机 IP: 未知")
+    # update_ip 方法已废弃，使用 IPAddressWidget 组件替代
 
     # ==================== 待办事项功能 ====================
     def load_todos(self):
@@ -916,6 +1101,7 @@ class DesktopTool(QMainWindow):
             widget = TodoItem(todo['text'], todo['done'], todo['id'], todo['seq'])
             widget.checkbox.stateChanged.connect(lambda state, tid=todo['id']: self.toggle_status(tid))
             widget.del_btn.clicked.connect(lambda checked, tid=todo['id']: self.delete_todo(tid))
+            widget.edit_btn.clicked.connect(lambda checked, tid=todo['id']: self.edit_todo(tid))
             
             if not todo['done']:
                 widget.drag_label.mousePressEvent = lambda e, idx=idx: self.start_drag(e, idx)
@@ -934,6 +1120,62 @@ class DesktopTool(QMainWindow):
                 break
         self.save_todos()
         self.render_todos()
+
+    def edit_todo(self, todo_id):
+        """编辑待办事项"""
+        for todo in self.todos:
+            if todo['id'] == todo_id:
+                # 创建编辑对话框
+                dialog = QDialog(self)
+                dialog.setWindowTitle("编辑待办事项")
+                dialog.setMinimumWidth(400)
+                
+                layout = QVBoxLayout(dialog)
+                
+                # 输入框
+                label = QLabel("修改待办内容：")
+                label.setStyleSheet("font-weight: bold; padding: 5px;")
+                layout.addWidget(label)
+                
+                text_edit = QTextEdit()
+                text_edit.setPlainText(todo['text'])
+                text_edit.setMaximumHeight(100)
+                layout.addWidget(text_edit)
+                
+                # 按钮
+                btn_layout = QHBoxLayout()
+                btn_layout.addStretch()
+                
+                cancel_btn = QPushButton("取消")
+                cancel_btn.clicked.connect(dialog.reject)
+                cancel_btn.setStyleSheet("padding: 8px 20px;")
+                btn_layout.addWidget(cancel_btn)
+                
+                save_btn = QPushButton("保存")
+                save_btn.setStyleSheet("padding: 8px 20px; background: #4CAF50; color: white; border: none; border-radius: 4px; font-weight: bold;")
+                save_btn.clicked.connect(lambda: self.save_edit(todo_id, text_edit.toPlainText(), dialog))
+                btn_layout.addWidget(save_btn)
+                
+                layout.addLayout(btn_layout)
+                
+                dialog.exec_()
+                break
+    
+    def save_edit(self, todo_id, new_text, dialog):
+        """保存编辑的待办事项"""
+        new_text = new_text.strip()
+        if not new_text:
+            QMessageBox.warning(self, "警告", "待办内容不能为空！")
+            return
+        
+        for todo in self.todos:
+            if todo['id'] == todo_id:
+                todo['text'] = new_text
+                break
+        
+        self.save_todos()
+        self.render_todos()
+        dialog.accept()
 
     def delete_todo(self, todo_id):
         reply = QMessageBox.question(self, "确认", "确定要删除吗？", QMessageBox.Yes | QMessageBox.No)
