@@ -704,7 +704,6 @@ class TodoItem(QWidget):
             QPushButton { 
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                     stop:0 #81d4fa, stop:1 #4fc3f7);
-                color: white; 
                 border: none; 
                 border-radius: 8px;
                 font-size: 16px;
@@ -726,7 +725,6 @@ class TodoItem(QWidget):
             QPushButton { 
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                     stop:0 #ef9a9a, stop:1 #ef5350);
-                color: white; 
                 border: none; 
                 border-radius: 8px;
                 font-size: 16px;
@@ -1744,12 +1742,20 @@ class DesktopTool(QMainWindow):
         to_widget = self.todo_layout.itemAt(to_idx).widget()
         if from_widget is None or to_widget is None:
             return False
-        if to_widget.is_done:
+        # 不能拖动已完成的项目，也不能拖到已完成的项目上
+        if from_widget.is_done or to_widget.is_done:
             return False
-        self.todo_layout.takeAt(from_idx)
-        self.todo_layout.takeAt(to_idx if to_idx < from_idx else to_idx - 1)
-        self.todo_layout.insertWidget(to_idx, from_widget)
-        self.todo_layout.insertWidget(from_idx, to_widget)
+        # 使用更安全的交换方式：先移除位置较高的，再移除位置较低的
+        if from_idx < to_idx:
+            self.todo_layout.takeAt(to_idx)
+            self.todo_layout.takeAt(from_idx)
+            self.todo_layout.insertWidget(from_idx, to_widget)
+            self.todo_layout.insertWidget(to_idx, from_widget)
+        else:
+            self.todo_layout.takeAt(from_idx)
+            self.todo_layout.takeAt(to_idx)
+            self.todo_layout.insertWidget(to_idx, from_widget)
+            self.todo_layout.insertWidget(from_idx, to_widget)
         return True
 
     def end_drag(self, event):
