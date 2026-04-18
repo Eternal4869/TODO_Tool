@@ -670,58 +670,46 @@ class TodoItem(QWidget):
     
     def setup_ui(self, text, done):
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 10, 12, 10)
-        layout.setSpacing(12)
-        
-        # 拖动手柄
-        self.drag_label = QLabel("⋮⋮")
-        self.drag_label.setCursor(Qt.OpenHandCursor)
-        self.drag_label.setFixedSize(20, 20)
-        self.drag_label.setAlignment(Qt.AlignCenter)
-        self.drag_label.setStyleSheet("""
-            color: #bdbdbd;
-            font-size: 14px;
-            font-weight: bold;
-            background: transparent;
-        """)
-        if done:
-            self.drag_label.setText("🔒")
-            self.drag_label.setCursor(Qt.ArrowCursor)
-        layout.addWidget(self.drag_label)
+        layout.setContentsMargins(16, 12, 16, 12)
+        layout.setSpacing(16)
         
         # 复选框
         self.checkbox = QCheckBox()
         self.checkbox.setChecked(done)
-        self.checkbox.setFixedSize(20, 20)
+        self.checkbox.setFixedSize(22, 22)
+        self.checkbox.setCursor(Qt.PointingHandCursor)
         layout.addWidget(self.checkbox)
         
-        # 文本标签
+        # 文本标签 - 可拖动区域
         self.label = QLabel(text)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.label.setStyleSheet("""
             color: #424242;
-            font-size: 14px;
-            padding: 4px 8px;
+            font-size: 15px;
+            padding: 6px 10px;
+            background: transparent;
         """)
         if done:
             self.label.setStyleSheet("""
                 color: #bdbdbd;
                 text-decoration: line-through;
-                font-size: 14px;
-                padding: 4px 8px;
+                font-size: 15px;
+                padding: 6px 10px;
+                background: transparent;
             """)
         layout.addWidget(self.label, stretch=1)
         
         # 编辑按钮 - 使用图标样式
-        self.edit_btn = QPushButton()
-        self.edit_btn.setFixedSize(32, 32)
+        self.edit_btn = QPushButton("✏️")
+        self.edit_btn.setFixedSize(36, 36)
         self.edit_btn.setToolTip("编辑")
         self.edit_btn.setCursor(Qt.PointingHandCursor)
         self.edit_btn.setStyleSheet("""
             QPushButton {
                 background-color: transparent;
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
+                font-size: 18px;
             }
             QPushButton:hover {
                 background-color: #e3f2fd;
@@ -730,22 +718,19 @@ class TodoItem(QWidget):
                 background-color: #bbdefb;
             }
         """)
-        edit_icon_label = QLabel("✏️", self.edit_btn)
-        edit_icon_label.setAlignment(Qt.AlignCenter)
-        edit_icon_label.setStyleSheet("font-size: 16px; background: transparent;")
-        edit_icon_label.setAttribute(Qt.WA_TransparentForMouseEvents)
         layout.addWidget(self.edit_btn)
         
         # 删除按钮 - 使用图标样式
-        self.del_btn = QPushButton()
-        self.del_btn.setFixedSize(32, 32)
+        self.del_btn = QPushButton("🗑️")
+        self.del_btn.setFixedSize(36, 36)
         self.del_btn.setToolTip("删除")
         self.del_btn.setCursor(Qt.PointingHandCursor)
         self.del_btn.setStyleSheet("""
             QPushButton {
                 background-color: transparent;
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
+                font-size: 18px;
             }
             QPushButton:hover {
                 background-color: #ffebee;
@@ -754,10 +739,6 @@ class TodoItem(QWidget):
                 background-color: #ffcdd2;
             }
         """)
-        delete_icon_label = QLabel("🗑️", self.del_btn)
-        delete_icon_label.setAlignment(Qt.AlignCenter)
-        delete_icon_label.setStyleSheet("font-size: 16px; background: transparent;")
-        delete_icon_label.setAttribute(Qt.WA_TransparentForMouseEvents)
         layout.addWidget(self.del_btn)
         
         # 设置整体样式
@@ -769,11 +750,12 @@ class TodoItem(QWidget):
             }
             QWidget:hover {
                 background: #fafafa;
-                border: 1px solid #90caf9;
+                border: 2px solid #90caf9;
                 border-radius: 12px;
             }
         """)
         self.setLayout(layout)
+        self.setCursor(Qt.OpenHandCursor if not done else Qt.ArrowCursor)
 
 # ==================== 快捷启动组件 ====================
 class AppLauncherButton(QWidget):
@@ -1752,12 +1734,12 @@ class DesktopTool(QMainWindow):
             widget.edit_btn.clicked.connect(lambda checked, tid=todo['id']: self.edit_todo(tid))
             
             if not todo['done']:
-                widget.drag_label.mousePressEvent = lambda e, idx=idx: self.start_drag(e, idx)
-                widget.drag_label.mouseMoveEvent = self.do_drag
-                widget.drag_label.mouseReleaseEvent = self.end_drag
-                widget.setCursor(Qt.OpenHandCursor)
-            else:
-                widget.setCursor(Qt.ArrowCursor)
+                # 将整个 widget 的鼠标事件绑定到拖动功能，但排除按钮点击区域
+                widget.label.mousePressEvent = lambda e, idx=idx: self.start_drag(e, idx)
+                widget.label.mouseMoveEvent = self.do_drag
+                widget.label.mouseReleaseEvent = self.end_drag
+                # 让整个 widget 也可以触发拖动（通过 label）
+                widget.mousePressEvent = lambda e: widget.label.mousePressEvent(e) if not e.pos().x() > widget.width() - 100 else None
             
             self.todo_layout.addWidget(widget)
 
