@@ -13,6 +13,493 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+# ==================== 现代化全局样式 ====================
+MODERN_STYLESHEET = """
+/* ===== 全局基础样式 ===== */
+* {
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+}
+
+QMainWindow {
+    background-color: #f8f9fa;
+}
+
+QWidget {
+    background-color: transparent;
+}
+
+/* ===== 按钮样式 ===== */
+QPushButton {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 500;
+    min-height: 36px;
+}
+
+QPushButton:hover {
+    background-color: #bbdefb;
+}
+
+QPushButton:pressed {
+    background-color: #90caf9;
+}
+
+QPushButton:disabled {
+    background-color: #e0e0e0;
+    color: #9e9e9e;
+}
+
+/* 主要操作按钮 */
+QPushButton#primaryBtn {
+    background-color: #2196f3;
+    color: white;
+}
+
+QPushButton#primaryBtn:hover {
+    background-color: #1976d2;
+}
+
+QPushButton#primaryBtn:pressed {
+    background-color: #1565c0;
+}
+
+/* 危险操作按钮 */
+QPushButton#dangerBtn {
+    background-color: #ef5350;
+    color: white;
+}
+
+QPushButton#dangerBtn:hover {
+    background-color: #e53935;
+}
+
+QPushButton#dangerBtn:pressed {
+    background-color: #c62828;
+}
+
+/* 成功按钮 */
+QPushButton#successBtn {
+    background-color: #66bb6a;
+    color: white;
+}
+
+QPushButton#successBtn:hover {
+    background-color: #43a047;
+}
+
+QPushButton#successBtn:pressed {
+    background-color: #2e7d32;
+}
+
+/* ===== 输入框样式 ===== */
+QLineEdit {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    selection-background-color: #2196f3;
+    selection-color: white;
+}
+
+QLineEdit:hover {
+    border: 1px solid #90caf9;
+}
+
+QLineEdit:focus {
+    border: 2px solid #2196f3;
+    padding: 7px 11px;
+}
+
+QLineEdit:disabled {
+    background-color: #f5f5f5;
+    color: #9e9e9e;
+}
+
+/* ===== 标签样式 ===== */
+QLabel {
+    color: #424242;
+    background-color: transparent;
+}
+
+QLabel#titleLabel {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1976d2;
+}
+
+QLabel#sectionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #424242;
+}
+
+/* ===== 分组框样式 ===== */
+QGroupBox {
+    font-weight: 600;
+    color: #424242;
+    margin-top: 12px;
+    padding-top: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 12px;
+    padding: 0 8px;
+    color: #1976d2;
+}
+
+/* ===== 滚动区域样式 ===== */
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QScrollBar:vertical {
+    background-color: #f5f5f5;
+    width: 10px;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #bdbdbd;
+    border-radius: 5px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #9e9e9e;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: #f5f5f5;
+    height: 10px;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #bdbdbd;
+    border-radius: 5px;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #9e9e9e;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* ===== 选项卡样式 ===== */
+QTabWidget::pane {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+    top: -1px;
+}
+
+QTabBar::tab {
+    background-color: #f5f5f5;
+    color: #757575;
+    padding: 10px 20px;
+    margin-right: 2px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-weight: 500;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    color: #1976d2;
+    border-bottom: 2px solid #2196f3;
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: #eeeeee;
+}
+
+/* ===== 复选框样式 ===== */
+QCheckBox {
+    color: #424242;
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid #e0e0e0;
+    background-color: white;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #2196f3;
+    border-color: #2196f3;
+    image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjIwIDYgOSAxNyA0IDEyIi8+PC9zdmc+);
+}
+
+QCheckBox::indicator:hover {
+    border-color: #2196f3;
+}
+
+/* ===== 进度条样式 ===== */
+QProgressBar {
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    height: 8px;
+    text-align: center;
+    border: none;
+}
+
+QProgressBar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #64b5f6, stop:1 #2196f3);
+    border-radius: 6px;
+}
+
+/* ===== 文本编辑区样式 ===== */
+QTextEdit {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    selection-background-color: #2196f3;
+    selection-color: white;
+}
+
+QTextEdit:hover {
+    border: 1px solid #90caf9;
+}
+
+QTextEdit:focus {
+    border: 2px solid #2196f3;
+    padding: 9px;
+}
+
+/* ===== 列表和表格样式 ===== */
+QListWidget, QTableWidget, QTreeWidget {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+}
+
+QListWidget::item, QTableWidget::item, QTreeWidget::item {
+    padding: 8px;
+    border-radius: 4px;
+}
+
+QListWidget::item:selected, QTableWidget::item:selected, QTreeWidget::item:selected {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+QListWidget::item:hover, QTableWidget::item:hover, QTreeWidget::item:hover {
+    background-color: #f5f5f5;
+}
+
+/* ===== 分隔线样式 ===== */
+QFrame[frameShape=\"QFrame::HLine\"] {
+    max-height: 1px;
+    background-color: #e0e0e0;
+    border: none;
+}
+
+QFrame[frameShape=\"QFrame::VLine\"] {
+    max-width: 1px;
+    background-color: #e0e0e0;
+    border: none;
+}
+
+/* ===== 工具提示样式 ===== */
+QToolTip {
+    background-color: #424242;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+/* ===== 状态栏样式 ===== */
+QStatusBar {
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* ===== 菜单样式 ===== */
+QMenu {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px 0;
+}
+
+QMenu::item {
+    padding: 8px 32px 8px 16px;
+}
+
+QMenu::item:selected {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 4px 0;
+}
+
+/* ===== 组合框样式 ===== */
+QComboBox {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-width: 120px;
+}
+
+QComboBox:hover {
+    border: 1px solid #90caf9;
+}
+
+QComboBox:focus {
+    border: 2px solid #2196f3;
+    padding: 7px 11px;
+}
+
+QComboBox::drop-down {
+    width: 30px;
+    border: none;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+QComboBox::down-arrow {
+    image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzU3NTc1IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiLz48L3N2Zz4=);
+    right: 10px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    selection-background-color: #e3f2fd;
+    selection-color: #1976d2;
+    outline: none;
+    padding: 8px;
+}
+
+QComboBox QAbstractItemView::item {
+    min-height: 40px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #f5f5f5;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+/* ===== 微调框样式 ===== */
+QSpinBox, QDoubleSpinBox {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+QSpinBox:hover, QDoubleSpinBox:hover {
+    border: 1px solid #90caf9;
+}
+
+QSpinBox:focus, QDoubleSpinBox:focus {
+    border: 2px solid #2196f3;
+    padding: 7px 11px;
+}
+
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    width: 20px;
+    border: none;
+    background-color: transparent;
+}
+
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+    background-color: #e3f2fd;
+}
+
+/* ===== 滑块样式 ===== */
+QSlider::groove:horizontal {
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;
+    background-color: #2196f3;
+    border-radius: 9px;
+}
+
+QSlider::handle:horizontal:hover {
+    background-color: #1976d2;
+}
+
+QSlider::add-page:horizontal {
+    background-color: #e0e0e0;
+    border-radius: 3px;
+}
+
+QSlider::sub-page:horizontal {
+    background-color: #2196f3;
+    border-radius: 3px;
+}
+
+/* ===== 无线电按钮样式 ===== */
+QRadioButton {
+    color: #424242;
+    spacing: 8px;
+}
+
+QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    background-color: white;
+}
+
+QRadioButton::indicator:checked {
+    background-color: white;
+    border-color: #2196f3;
+    image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzIxOTZmMyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNiIvPjwvc3ZnPg==);
+}
+
+QRadioButton::indicator:hover {
+    border-color: #2196f3;
+}
+"""
+
 # ==================== IP 地址显示组件 ====================
 class IPAddressWidget(QWidget):
     def __init__(self, parent=None):
@@ -22,12 +509,12 @@ class IPAddressWidget(QWidget):
     
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(5)
+        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setSpacing(8)
         
         # 标题
         title_label = QLabel("🌐 本机 IP 地址")
-        title_label.setStyleSheet("font-weight: bold; font-size: 14px; color: #0078D7;")
+        title_label.setObjectName("sectionTitle")
         main_layout.addWidget(title_label)
         
         # IP 列表容器 - 使用 QHBoxLayout 代替 QFlowLayout
@@ -112,20 +599,23 @@ class IPAddressWidget(QWidget):
     
     def create_ip_button(self, ip_info):
         """创建 IP 地址按钮"""
-        btn = QPushButton(f"{ip_info['ip']}")
+        btn = QPushButton(f"🌐 {ip_info['ip']}")
         btn.setToolTip(f"接口：{ip_info['interface']}\n类型：{ip_info['type']}\n右键点击复制")
         btn.setStyleSheet("""
             QPushButton {
-                background: #e3f2fd;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #e3f2fd, stop:1 #bbdefb);
                 border: 1px solid #90caf9;
-                border-radius: 4px;
-                padding: 5px 10px;
+                border-radius: 6px;
+                padding: 6px 12px;
                 color: #1565c0;
                 font-family: Consolas, monospace;
                 font-size: 12px;
+                font-weight: 500;
             }
             QPushButton:hover {
-                background: #bbdefb;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #bbdefb, stop:1 #90caf9);
                 border: 1px solid #64b5f6;
             }
             QPushButton:pressed {
@@ -180,17 +670,17 @@ class TodoItem(QWidget):
     
     def setup_ui(self, text, done):
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(5, 5, 5, 5)
-        layout.setSpacing(5)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(8)
         
-        self.drag_label = QLabel("☰ ")
+        self.drag_label = QLabel("☰")
         self.drag_label.setCursor(Qt.OpenHandCursor)
-        self.drag_label.setFixedSize(20, 20)
+        self.drag_label.setFixedSize(24, 24)
         self.drag_label.setAlignment(Qt.AlignCenter)
-        self.drag_label.setStyleSheet("color: #666666; font-size: 16px; ")
+        self.drag_label.setStyleSheet("color: #9e9e9e; font-size: 18px; font-weight: bold;")
         if done:
-            self.drag_label.setText("🔒 ")
-            self.drag_label.setStyleSheet("color: #cccccc; font-size: 14px; ")
+            self.drag_label.setText("🔒")
+            self.drag_label.setStyleSheet("color: #bdbdbd; font-size: 16px;")
             self.drag_label.setCursor(Qt.ArrowCursor)
         layout.addWidget(self.drag_label)
         
@@ -201,42 +691,52 @@ class TodoItem(QWidget):
         
         self.label = QLabel(text)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.label.setStyleSheet("padding: 3px;")
+        self.label.setStyleSheet("padding: 4px 8px; color: #424242;")
         if done:
-            self.label.setStyleSheet("color: #888888; text-decoration: line-through; padding: 3px;")
-        layout.addWidget(self.label)
+            self.label.setStyleSheet("color: #bdbdbd; text-decoration: line-through; padding: 4px 8px;")
+        layout.addWidget(self.label, stretch=1)
         
         # 编辑按钮
         self.edit_btn = QPushButton("✏️")
-        self.edit_btn.setFixedSize(25, 25)
+        self.edit_btn.setFixedSize(32, 32)
         self.edit_btn.setToolTip("编辑")
         self.edit_btn.setStyleSheet("""
             QPushButton { 
-                background: #4fc3f7; 
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #81d4fa, stop:1 #4fc3f7);
                 color: white; 
                 border: none; 
-                border-radius: 3px;
-                font-size: 14px;
+                border-radius: 8px;
+                font-size: 16px;
             }
             QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #4fc3f7, stop:1 #29b6f6);
+            }
+            QPushButton:pressed {
                 background: #29b6f6;
             }
         """)
         layout.addWidget(self.edit_btn)
         
         self.del_btn = QPushButton("🗑️")
-        self.del_btn.setFixedSize(25, 25)
+        self.del_btn.setFixedSize(32, 32)
         self.del_btn.setToolTip("删除")
         self.del_btn.setStyleSheet("""
             QPushButton { 
-                background: #ff6b6b; 
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #ef9a9a, stop:1 #ef5350);
                 color: white; 
                 border: none; 
-                border-radius: 3px;
-                font-size: 14px;
+                border-radius: 8px;
+                font-size: 16px;
             }
             QPushButton:hover {
-                background: #ee5a5a;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #ef5350, stop:1 #e53935);
+            }
+            QPushButton:pressed {
+                background: #e53935;
             }
         """)
         layout.addWidget(self.del_btn)
@@ -246,11 +746,13 @@ class TodoItem(QWidget):
             QWidget {
                 background: white;
                 border: 1px solid #e0e0e0;
-                border-radius: 5px;
+                border-radius: 10px;
             }
             QWidget:hover {
-                background: #f5f5f5;
-                border: 1px solid #bdbdbd;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #ffffff, stop:1 #f5f5f5);
+                border: 1px solid #90caf9;
+                border-radius: 10px;
             }
         """)
         self.setLayout(layout)
@@ -265,35 +767,51 @@ class AppLauncherButton(QWidget):
     
     def setup_ui(self, icon):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setContentsMargins(16, 16, 16, 16)
         layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(8)
         
-        self.icon_label = QLabel("🚀 ")
+        # 图标容器
+        icon_container = QWidget()
+        icon_container.setFixedSize(72, 72)
+        icon_container.setStyleSheet("""
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #e3f2fd, stop:1 #bbdefb);
+                border-radius: 16px;
+            }
+        """)
+        icon_layout = QVBoxLayout(icon_container)
+        icon_layout.setAlignment(Qt.AlignCenter)
+        
+        self.icon_label = QLabel("🚀")
         if icon and os.path.exists(icon):
-            pixmap = QPixmap(icon).scaled(48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = QPixmap(icon).scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.icon_label.setPixmap(pixmap)
         else:
-            self.icon_label.setStyleSheet("font-size: 48px; ")
+            self.icon_label.setStyleSheet("font-size: 36px;")
         self.icon_label.setAlignment(Qt.AlignCenter)
-        self.icon_label.setFixedSize(60, 60)
-        layout.addWidget(self.icon_label)
+        icon_layout.addWidget(self.icon_label)
+        
+        layout.addWidget(icon_container)
         
         self.name_label = QLabel(self.name)
         self.name_label.setAlignment(Qt.AlignCenter)
         self.name_label.setWordWrap(True)
         self.name_label.setMaximumWidth(100)
-        self.name_label.setStyleSheet("font-size: 12px; ")
+        self.name_label.setStyleSheet("font-size: 12px; color: #424242; font-weight: 500;")
         layout.addWidget(self.name_label)
         
         self.setStyleSheet("""
             QWidget {
-                background: #f5f5f5;
-                border: 1px solid #ddd;
-                border-radius: 8px;
+                background: white;
+                border: 2px solid #e0e0e0;
+                border-radius: 16px;
             }
             QWidget:hover {
-                background: #e0e0e0;
-                border: 1px solid #bbb;
+                background: white;
+                border: 2px solid #90caf9;
+                border-radius: 16px;
             }
         """)
         self.setCursor(Qt.PointingHandCursor)
@@ -826,13 +1344,29 @@ class DesktopTool(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle("个人效率小工具")
-        self.setGeometry(100, 100, 900, 800)
+        self.setGeometry(100, 100, 950, 850)
+        
+        # 设置窗口最小大小
+        self.setMinimumSize(800, 600)
+        
+        # 添加阴影效果
+        shadow_effect = QGraphicsDropShadowEffect()
+        shadow_effect.setBlurRadius(30)
+        shadow_effect.setXOffset(0)
+        shadow_effect.setYOffset(2)
+        shadow_effect.setColor(QColor(0, 0, 0, 40))
         
         central = QWidget()
+        central.setObjectName("centralWidget")
+        central.setStyleSheet("""
+            QWidget#centralWidget {
+                background-color: #f8f9fa;
+            }
+        """)
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(16, 16, 16, 16)
+        main_layout.setSpacing(12)
         
         # === 顶部信息区 ===
         # 使用新的 IP 地址显示组件
@@ -1395,6 +1929,8 @@ class DesktopTool(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
+    # 应用现代化全局样式
+    app.setStyleSheet(MODERN_STYLESHEET)
     window = DesktopTool()
     window.show()
     sys.exit(app.exec_())
