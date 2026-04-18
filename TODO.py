@@ -670,73 +670,94 @@ class TodoItem(QWidget):
     
     def setup_ui(self, text, done):
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(8, 8, 8, 8)
-        layout.setSpacing(8)
+        layout.setContentsMargins(12, 10, 12, 10)
+        layout.setSpacing(12)
         
-        self.drag_label = QLabel("☰")
+        # 拖动手柄
+        self.drag_label = QLabel("⋮⋮")
         self.drag_label.setCursor(Qt.OpenHandCursor)
-        self.drag_label.setFixedSize(24, 24)
+        self.drag_label.setFixedSize(20, 20)
         self.drag_label.setAlignment(Qt.AlignCenter)
-        self.drag_label.setStyleSheet("color: #9e9e9e; font-size: 18px; font-weight: bold;")
+        self.drag_label.setStyleSheet("""
+            color: #bdbdbd;
+            font-size: 14px;
+            font-weight: bold;
+            background: transparent;
+        """)
         if done:
             self.drag_label.setText("🔒")
-            self.drag_label.setStyleSheet("color: #bdbdbd; font-size: 16px;")
             self.drag_label.setCursor(Qt.ArrowCursor)
         layout.addWidget(self.drag_label)
         
+        # 复选框
         self.checkbox = QCheckBox()
         self.checkbox.setChecked(done)
         self.checkbox.setFixedSize(20, 20)
         layout.addWidget(self.checkbox)
         
+        # 文本标签
         self.label = QLabel(text)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.label.setStyleSheet("padding: 4px 8px; color: #424242;")
+        self.label.setStyleSheet("""
+            color: #424242;
+            font-size: 14px;
+            padding: 4px 8px;
+        """)
         if done:
-            self.label.setStyleSheet("color: #bdbdbd; text-decoration: line-through; padding: 4px 8px;")
+            self.label.setStyleSheet("""
+                color: #bdbdbd;
+                text-decoration: line-through;
+                font-size: 14px;
+                padding: 4px 8px;
+            """)
         layout.addWidget(self.label, stretch=1)
         
-        # 编辑按钮
-        self.edit_btn = QPushButton("✏️")
+        # 编辑按钮 - 使用图标样式
+        self.edit_btn = QPushButton()
         self.edit_btn.setFixedSize(32, 32)
         self.edit_btn.setToolTip("编辑")
+        self.edit_btn.setCursor(Qt.PointingHandCursor)
         self.edit_btn.setStyleSheet("""
-            QPushButton { 
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #81d4fa, stop:1 #4fc3f7);
-                border: none; 
-                border-radius: 8px;
-                font-size: 16px;
+            QPushButton {
+                background-color: transparent;
+                border: none;
+                border-radius: 6px;
             }
             QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #4fc3f7, stop:1 #29b6f6);
+                background-color: #e3f2fd;
             }
             QPushButton:pressed {
-                background: #29b6f6;
+                background-color: #bbdefb;
             }
         """)
+        edit_icon_label = QLabel("✏️", self.edit_btn)
+        edit_icon_label.setAlignment(Qt.AlignCenter)
+        edit_icon_label.setStyleSheet("font-size: 16px; background: transparent;")
+        edit_icon_label.setAttribute(Qt.WA_TransparentForMouseEvents)
         layout.addWidget(self.edit_btn)
         
-        self.del_btn = QPushButton("🗑️")
+        # 删除按钮 - 使用图标样式
+        self.del_btn = QPushButton()
         self.del_btn.setFixedSize(32, 32)
         self.del_btn.setToolTip("删除")
+        self.del_btn.setCursor(Qt.PointingHandCursor)
         self.del_btn.setStyleSheet("""
-            QPushButton { 
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #ef9a9a, stop:1 #ef5350);
-                border: none; 
-                border-radius: 8px;
-                font-size: 16px;
+            QPushButton {
+                background-color: transparent;
+                border: none;
+                border-radius: 6px;
             }
             QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #ef5350, stop:1 #e53935);
+                background-color: #ffebee;
             }
             QPushButton:pressed {
-                background: #e53935;
+                background-color: #ffcdd2;
             }
         """)
+        delete_icon_label = QLabel("🗑️", self.del_btn)
+        delete_icon_label.setAlignment(Qt.AlignCenter)
+        delete_icon_label.setStyleSheet("font-size: 16px; background: transparent;")
+        delete_icon_label.setAttribute(Qt.WA_TransparentForMouseEvents)
         layout.addWidget(self.del_btn)
         
         # 设置整体样式
@@ -744,13 +765,12 @@ class TodoItem(QWidget):
             QWidget {
                 background: white;
                 border: 1px solid #e0e0e0;
-                border-radius: 10px;
+                border-radius: 12px;
             }
             QWidget:hover {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                    stop:0 #ffffff, stop:1 #f5f5f5);
+                background: #fafafa;
                 border: 1px solid #90caf9;
-                border-radius: 10px;
+                border-radius: 12px;
             }
         """)
         self.setLayout(layout)
@@ -765,9 +785,9 @@ class AppLauncherButton(QWidget):
     
     def setup_ui(self, icon):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setContentsMargins(16, 12, 16, 12)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(8)
+        layout.setSpacing(10)
         
         # 图标容器
         icon_container = QWidget()
@@ -777,6 +797,10 @@ class AppLauncherButton(QWidget):
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                     stop:0 #e3f2fd, stop:1 #bbdefb);
                 border-radius: 16px;
+            }
+            QWidget:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #bbdefb, stop:1 #90caf9);
             }
         """)
         icon_layout = QVBoxLayout(icon_container)
@@ -797,7 +821,7 @@ class AppLauncherButton(QWidget):
         self.name_label.setAlignment(Qt.AlignCenter)
         self.name_label.setWordWrap(True)
         self.name_label.setMaximumWidth(100)
-        self.name_label.setStyleSheet("font-size: 12px; color: #424242; font-weight: 500;")
+        self.name_label.setStyleSheet("font-size: 13px; color: #424242; font-weight: 500;")
         layout.addWidget(self.name_label)
         
         self.setStyleSheet("""
@@ -808,7 +832,7 @@ class AppLauncherButton(QWidget):
             }
             QWidget:hover {
                 background: white;
-                border: 2px solid #90caf9;
+                border: 2px solid #64b5f6;
                 border-radius: 16px;
             }
         """)
@@ -1345,7 +1369,7 @@ class DesktopTool(QMainWindow):
         self.setGeometry(100, 100, 950, 850)
         
         # 设置窗口最小大小
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(900, 650)
         
         # 添加阴影效果
         shadow_effect = QGraphicsDropShadowEffect()
@@ -1359,12 +1383,13 @@ class DesktopTool(QMainWindow):
         central.setStyleSheet("""
             QWidget#centralWidget {
                 background-color: #f8f9fa;
+                border-radius: 12px;
             }
         """)
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
-        main_layout.setContentsMargins(16, 16, 16, 16)
-        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(16)
         
         # === 顶部信息区 ===
         # 使用新的 IP 地址显示组件
@@ -1425,53 +1450,132 @@ class DesktopTool(QMainWindow):
         # 底部操作区（仅待办事项页显示）
         self.control_widget = QWidget()
         control_layout = QHBoxLayout(self.control_widget)
-        control_layout.setContentsMargins(0, 0, 0, 0)
+        control_layout.setContentsMargins(0, 8, 0, 0)
+        control_layout.setSpacing(12)
         
         self.entry = QLineEdit()
         self.entry.setPlaceholderText("输入待办事项...")
+        self.entry.setFixedHeight(44)
+        self.entry.setStyleSheet("""
+            QLineEdit {
+                background-color: white;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            QLineEdit:hover {
+                border: 2px solid #90caf9;
+            }
+            QLineEdit:focus {
+                border: 2px solid #2196f3;
+            }
+        """)
         self.entry.returnPressed.connect(self.add_todo)
         control_layout.addWidget(self.entry, stretch=1)
         
-        add_btn = QPushButton("添加待办")
+        add_btn = QPushButton("➕ 添加待办")
+        add_btn.setObjectName("primaryBtn")
+        add_btn.setFixedHeight(44)
         add_btn.clicked.connect(self.add_todo)
+        add_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196f3;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 20px;
+                font-weight: 600;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #1976d2;
+            }
+            QPushButton:pressed {
+                background-color: #1565c0;
+            }
+        """)
         control_layout.addWidget(add_btn)
         
-        self.topmost_chk = QCheckBox("窗口置顶")
+        self.topmost_chk = QCheckBox("📌 窗口置顶")
+        self.topmost_chk.setStyleSheet("""
+            QCheckBox {
+                color: #424242;
+                font-size: 14px;
+                font-weight: 500;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
+                border: 2px solid #e0e0e0;
+                background-color: white;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #2196f3;
+                border-color: #2196f3;
+            }
+            QCheckBox::indicator:hover {
+                border-color: #2196f3;
+            }
+        """)
         self.topmost_chk.stateChanged.connect(self.toggle_topmost)
         control_layout.addWidget(self.topmost_chk)
         
         main_layout.addWidget(self.control_widget)
 
     def setup_todo_tab(self):
-        todo_label = QLabel("📋 待办事项 (拖动 ☰ 排序)")
-        todo_label.setStyleSheet("font-weight: bold; font-size: 14px; ")
+        todo_label = QLabel("📋 待办事项 (拖动 ⋮⋮ 排序)")
+        todo_label.setStyleSheet("font-weight: bold; font-size: 15px; color: #1976d2;")
         self.todo_tab_layout.addWidget(todo_label)
         
         self.todo_scroll = QScrollArea()
         self.todo_scroll.setWidgetResizable(True)
         self.todo_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.todo_scroll.setStyleSheet("""
+            QScrollArea {
+                background-color: transparent;
+                border: none;
+            }
+        """)
         self.todo_content = QWidget()
         self.todo_layout = QVBoxLayout(self.todo_content)
         self.todo_layout.setAlignment(Qt.AlignTop)
-        self.todo_layout.setSpacing(5)
+        self.todo_layout.setContentsMargins(0, 0, 0, 0)
+        self.todo_layout.setSpacing(8)
         self.todo_scroll.setWidget(self.todo_content)
-        self.todo_scroll.setMinimumHeight(200)
-        self.todo_scroll.setMaximumHeight(250)
+        self.todo_scroll.setMinimumHeight(220)
+        self.todo_scroll.setMaximumHeight(300)
         self.todo_tab_layout.addWidget(self.todo_scroll)
         
         separator2 = QFrame()
         separator2.setFrameShape(QFrame.HLine)
         separator2.setFrameShadow(QFrame.Sunken)
+        separator2.setStyleSheet("background-color: #e0e0e0; max-height: 1px;")
         self.todo_tab_layout.addWidget(separator2)
         
         memo_label = QLabel("📝 备忘录")
-        memo_label.setStyleSheet("font-weight: bold; font-size: 14px; ")
+        memo_label.setStyleSheet("font-weight: bold; font-size: 15px; color: #1976d2; margin-top: 8px;")
         self.todo_tab_layout.addWidget(memo_label)
         
         self.memo_text = QTextEdit()
         self.memo_text.setFont(QFont("Consolas", 11))
+        self.memo_text.setPlaceholderText("在此输入备忘录内容...")
         self.memo_text.setMinimumHeight(150)
         self.memo_text.setMaximumHeight(200)
+        self.memo_text.setStyleSheet("""
+            QTextEdit {
+                background-color: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 12px;
+            }
+            QTextEdit:focus {
+                border: 2px solid #2196f3;
+                padding: 11px;
+            }
+        """)
         self.memo_text.textChanged.connect(self.on_memo_change)
         self.todo_tab_layout.addWidget(self.memo_text)
         
@@ -1483,22 +1587,27 @@ class DesktopTool(QMainWindow):
     def setup_apps_tab(self):
         header_layout = QHBoxLayout()
         apps_label = QLabel("🚀 快捷启动程序")
-        apps_label.setStyleSheet("font-weight: bold; font-size: 14px; ")
+        apps_label.setStyleSheet("font-weight: bold; font-size: 15px; color: #1976d2;")
         header_layout.addWidget(apps_label)
         header_layout.addStretch()
         
         add_app_btn = QPushButton("+ 添加程序")
+        add_app_btn.setObjectName("successBtn")
         add_app_btn.clicked.connect(self.add_app)
         add_app_btn.setStyleSheet("""
             QPushButton {
-                background: #4CAF50;
+                background-color: #4CAF50;
                 color: white;
                 border: none;
-                border-radius: 4px;
-                padding: 5px 15px;
+                border-radius: 6px;
+                padding: 8px 16px;
+                font-weight: 500;
             }
             QPushButton:hover {
-                background: #45a049;
+                background-color: #43a047;
+            }
+            QPushButton:pressed {
+                background-color: #388e3c;
             }
         """)
         header_layout.addWidget(add_app_btn)
@@ -1507,15 +1616,22 @@ class DesktopTool(QMainWindow):
         self.apps_scroll = QScrollArea()
         self.apps_scroll.setWidgetResizable(True)
         self.apps_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.apps_scroll.setStyleSheet("""
+            QScrollArea {
+                background-color: transparent;
+                border: none;
+            }
+        """)
         self.apps_content = QWidget()
         self.apps_grid = QGridLayout(self.apps_content)
         self.apps_grid.setAlignment(Qt.AlignTop)
-        self.apps_grid.setSpacing(15)
+        self.apps_grid.setContentsMargins(10, 10, 10, 10)
+        self.apps_grid.setSpacing(16)
         self.apps_scroll.setWidget(self.apps_content)
         self.apps_tab_layout.addWidget(self.apps_scroll)
         
         hint_label = QLabel("💡 提示：点击按钮启动程序，右键按钮可删除")
-        hint_label.setStyleSheet("color: #888888; font-size: 11px; ")
+        hint_label.setStyleSheet("color: #9e9e9e; font-size: 12px; padding: 8px;")
         hint_label.setAlignment(Qt.AlignCenter)
         self.apps_tab_layout.addWidget(hint_label)
 
@@ -1721,14 +1837,24 @@ class DesktopTool(QMainWindow):
         self.drag_start_pos = event.globalPos().y()
         self.dragged_widget = self.todo_layout.itemAt(index).widget()
         if self.dragged_widget:
-            self.dragged_widget.setStyleSheet("background: #e0e0e0; border-radius: 5px; ")
+            # 保存原始样式以便恢复
+            self.dragged_widget.setProperty("dragging", True)
+            self.dragged_widget.style().unpolish(self.dragged_widget)
+            self.dragged_widget.style().polish(self.dragged_widget)
+            self.dragged_widget.setStyleSheet("""
+                QWidget {
+                    background: #e3f2fd;
+                    border: 2px dashed #2196f3;
+                    border-radius: 12px;
+                }
+            """)
 
     def do_drag(self, event):
         if self.drag_start_idx is None or self.dragged_widget is None:
             return
         current_y = event.globalPos().y()
         delta = current_y - self.drag_start_pos
-        if abs(delta) > 40:
+        if abs(delta) > 50:  # 增加拖动阈值，使拖动更稳定
             direction = 1 if delta > 0 else -1
             target_idx = self.drag_start_idx + direction
             if self.swap_items(self.drag_start_idx, target_idx):
@@ -1738,24 +1864,35 @@ class DesktopTool(QMainWindow):
     def swap_items(self, from_idx, to_idx):
         if to_idx < 0 or to_idx >= self.todo_layout.count():
             return False
+        if from_idx == to_idx:
+            return False
+            
         from_widget = self.todo_layout.itemAt(from_idx).widget()
         to_widget = self.todo_layout.itemAt(to_idx).widget()
+        
         if from_widget is None or to_widget is None:
             return False
+        
         # 不能拖动已完成的项目，也不能拖到已完成的项目上
         if from_widget.is_done or to_widget.is_done:
             return False
-        # 使用更安全的交换方式：先移除位置较高的，再移除位置较低的
+        
+        # 使用正确的交换逻辑：根据索引大小决定移除顺序
+        # 关键：当从低索引向高索引移动时，先取高索引再取低索引
+        # 当从高索引向低索引移动时，先取低索引再取高索引
         if from_idx < to_idx:
+            # 向下拖动：先取目标位置（因为取出后索引会变化）
             self.todo_layout.takeAt(to_idx)
             self.todo_layout.takeAt(from_idx)
             self.todo_layout.insertWidget(from_idx, to_widget)
             self.todo_layout.insertWidget(to_idx, from_widget)
         else:
+            # 向上拖动：先取源位置
             self.todo_layout.takeAt(from_idx)
             self.todo_layout.takeAt(to_idx)
             self.todo_layout.insertWidget(to_idx, from_widget)
             self.todo_layout.insertWidget(from_idx, to_widget)
+        
         return True
 
     def end_drag(self, event):
